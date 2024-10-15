@@ -248,8 +248,42 @@ bool RegistrarJugadorFichero(char *jugador, char *contrasena)
 // HACER UN BUCLE HASTA QUE EL JUGADOR QUE QUIERE INICIAR PARTIDA ENCUENTRE A OTRO
 bool BuscarOponente(vector<struct jugadores> &vjugadores, int id)
 {
-}
+    int posicionvectorjugador1 = -1, posicionvectorjugador2 = -1;
+    for (int i = 0; i < vjugadores.size(); i++)
+    {
+        if ((vjugadores[i].identificadorUsuario == id) && (vjugadores[i].estado == 2))
+        {
+            vjugadores[i].estado = 3; // Cambiamos el estado a "listo para jugar"
+            posicionvectorjugador1 = i;
+            break;
+        }
+    }
 
+    int cont = 0;
+    do
+    {
+        for (int i = 0; i < vjugadores.size(); i++)
+        {
+            if ((vjugadores[i].identificadorUsuario != id) && (vjugadores[i].estado == 3)) // Jugador listo para iniciar partida
+            {
+                posicionvectorjugador2 = i;
+                cont++;
+                break;
+            }
+        }
+    } while (cont == 0);
+
+    if (posicionvectorjugador2 != -1) // Si se ha encontrado otro jugador
+    {
+        int idPartida = rand();
+        vjugadores[posicionvectorjugador1].estado = 4;
+        vjugadores[posicionvectorjugador1].identificadorPartida = idPartida;
+        vjugadores[posicionvectorjugador2].estado = 4;
+        vjugadores[posicionvectorjugador2].identificadorPartida = idPartida;
+        return true;
+    }
+    return false;
+}
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
 // ELIMINA UN JUGADOR DEL VECTOR CUANDO SE DESCONECTA
