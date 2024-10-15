@@ -21,7 +21,6 @@ struct jugadores
     vector<string> cartas;
     int suma; // Suma de la mano
     bool quiereOtraCarta;
-    bool estaEnPartida;
     int identificadorPartida;
     int identificadorUsuario;
 };
@@ -29,7 +28,6 @@ struct jugadores
 // LLENA EL VECTOR DE JUGADORES
 void LlenarVectorJugadores(vector<jugadores> &vjugadores)
 {
-    vjugadores.resize(MAX_CLIENTES); // Redimensionar para 30 jugadores
     for (int i = 0; i < MAX_CLIENTES; i++)
     {
         vjugadores[i].usuario = "";
@@ -38,7 +36,6 @@ void LlenarVectorJugadores(vector<jugadores> &vjugadores)
         vjugadores[i].turno = false;
         vjugadores[i].suma = 0;
         vjugadores[i].quiereOtraCarta = false;
-        vjugadores[i].estaEnPartida = false;
         vjugadores[i].identificadorPartida = -1;
         vjugadores[i].identificadorUsuario = -1;
     }
@@ -49,7 +46,7 @@ void LlenarVectorJugadores(vector<jugadores> &vjugadores)
 // COMPRUEBA SI EL JUGADOR ESTÁ CONECTADO CON SU USUARIO Y CONTRASEÑA (PARA QUE EL USUARIO PUEDA EMPEZAR UNA PARTIDA)
 bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
 {
-    for (int i = 0; i < MAX_CLIENTES; i++)
+    for (int i = 0; i < vjugadores.size(); i++)
     {
         if (vjugadores[i].identificadorUsuario == id && vjugadores[i].estado == 2)
         {
@@ -62,7 +59,7 @@ bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
 // COMPRUEBA QUE EL JUGADOR ESTÁ CONECTADO CON SU USUARIO (PARA QUE EL USUARIO PUEDA METER SU CONTRASENA)
 bool ConectadoConUsuario(vector<struct jugadores> vjugadores, int id, const char *jugador)
 {
-    for (int i = 0; i < MAX_CLIENTES; i++)
+    for (int i = 0; i < vjugadores.size(); i++)
     {
         if ((vjugadores[i].identificadorUsuario == id) && (strcmp(vjugadores[i].usuario.c_str(), jugador) == 0))
         {
@@ -87,9 +84,9 @@ bool comprobarConexiones(vector<struct jugadores> vjugadores, int id)
 // COMPRUEBA QUE HAY HUECO EN EL VECTOR Y EL JUGADOR SE INTRODUCE CON SU USUARIO (METER USUARIO DEL JUGADOR EN EL VECTOR)
 int IntroducirUsuarioRegistrado(vector<struct jugadores> vjugadores, int id, const char *jugador)
 {
-    for (int i = 0; i < MAX_CLIENTES; i++)
+    for (int i = 0; i < vjugadores.size(); i++)
     {
-        if (vjugadores[i].estado == 0) // Encontrar un hueco libre
+        if (vjugadores[i].estado == 0)
         {
             vjugadores[i].usuario = jugador;
             vjugadores[i].contraseña = "";
@@ -97,7 +94,6 @@ int IntroducirUsuarioRegistrado(vector<struct jugadores> vjugadores, int id, con
             vjugadores[i].turno = false;
             vjugadores[i].suma = 0;
             vjugadores[i].quiereOtraCarta = false;
-            vjugadores[i].estaEnPartida = false;
             vjugadores[i].identificadorPartida = -1;
             vjugadores[i].identificadorUsuario = id;
         }
@@ -107,14 +103,43 @@ int IntroducirUsuarioRegistrado(vector<struct jugadores> vjugadores, int id, con
 // COMPRUEBA QUE EL JUGADOR HA INTRODUCIDO LA CONTRASEÑA CORRECTA Y LO INTRODUCE EN EL VECTOR
 bool IntroducirContraseña(vector<struct jugadores> vjugadores, int id, const char *contrasena)
 {
-    for (int i = 0; i < MAX_CLIENTES; i++)
+    FILE *fichero;
+    char linea[MAX_LINEA];
+
+    fichero = fopen("usuarios.txt", "r");
+    if (fichero == NULL)
     {
-        if ((vjugadores[i].identificadorUsuario == id) && (strcmp(vjugadores[i].contraseña.c_str(), contrasena) == 0))
+        printf("Error al abrir el archivo.\n");
+        return false;
+    }
+
+    for (int i = 0; i < vjugadores.size(); i++)
+    {
+        if (vjugadores[i].identificadorUsuario == id)
         {
-            vjugadores[i].estado = 2;
-            return true;
+            while (fgets(linea, MAX_LINEA, fichero) != NULL)
+            {
+                char usuarioArchivo[MAX_LINEA];
+                char contrasenaArchivo[MAX_LINEA];
+
+                sscanf(linea, "%s;%s", usuarioArchivo, contrasenaArchivo);
+
+                if ((strcmp(usuarioArchivo, vjugadores[i].usuario.c_str()) == 0) && (strcmp(contrasenaArchivo, contrasena) == 0))
+                {
+                    vjugadores[i].contraseña = contrasena;
+                    vjugadores[i].estado = 2;
+                    vjugadores[i].turno = false;
+                    vjugadores[i].suma = 0;
+                    vjugadores[i].quiereOtraCarta = false;
+                    vjugadores[i].identificadorPartida = -1;
+                    vjugadores[i].identificadorUsuario = id;
+                    fclose(fichero);
+                    return true;
+                }
+            }
         }
     }
+    fclose(fichero);
     return false;
 }
 
@@ -169,7 +194,6 @@ bool RegistrarJugadorFichero(char *jugador, char *contrasena)
 }
 
 // ELIMINA UN JUGADOR DEL VECTOR CUANDO HA JUGADO TODAS LAS PARTIDAS (10)
-
 
 // ELIMINA UN JUGADOR DEL VECTOR CUANDO SE DESCONECTA
 
