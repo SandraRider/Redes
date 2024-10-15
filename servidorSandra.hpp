@@ -42,7 +42,6 @@ void LlenarVectorJugadores(vector<jugadores> &vjugadores)
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-
 // COMPRUEBA SI EL JUGADOR ESTÁ CONECTADO CON SU USUARIO Y CONTRASEÑA (PARA QUE EL USUARIO PUEDA EMPEZAR UNA PARTIDA)
 bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
 {
@@ -56,6 +55,7 @@ bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
     return false;
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 // COMPRUEBA QUE EL JUGADOR ESTÁ CONECTADO CON SU USUARIO (PARA QUE EL USUARIO PUEDA METER SU CONTRASENA)
 bool ConectadoConUsuario(vector<struct jugadores> vjugadores, int id, const char *jugador)
 {
@@ -69,6 +69,7 @@ bool ConectadoConUsuario(vector<struct jugadores> vjugadores, int id, const char
     return false;
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 // COMPRUEBA SI HAY SITIO EN EL VECTOR DE JUGADORES
 bool comprobarConexiones(vector<struct jugadores> vjugadores, int id)
 {
@@ -80,26 +81,82 @@ bool comprobarConexiones(vector<struct jugadores> vjugadores, int id)
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-
 // COMPRUEBA QUE HAY HUECO EN EL VECTOR Y EL JUGADOR SE INTRODUCE CON SU USUARIO (METER USUARIO DEL JUGADOR EN EL VECTOR)
 int IntroducirUsuarioRegistrado(vector<struct jugadores> vjugadores, int id, const char *jugador)
 {
-    for (int i = 0; i < vjugadores.size(); i++)
+    FILE *fichero;
+    char linea[MAX_LINEA];
+
+    fichero = fopen("usuarios.txt", "r");
+    if (fichero == NULL)
     {
-        if (vjugadores[i].estado == 0)
+        printf("Error al abrir el archivo.\n");
+        return false;
+    }
+
+    if (vjugadores.size() < MAX_CLIENTES)
+    {
+        /*for (int i = 0; i < vjugadores.size(); i++)
         {
-            vjugadores[i].usuario = jugador;
-            vjugadores[i].contraseña = "";
-            vjugadores[i].estado = 1; // Conectado con usuario
-            vjugadores[i].turno = false;
-            vjugadores[i].suma = 0;
-            vjugadores[i].quiereOtraCarta = false;
-            vjugadores[i].identificadorPartida = -1;
-            vjugadores[i].identificadorUsuario = id;
+            if (vjugadores[i].estado == 0)
+            {
+                while (fgets(linea, MAX_LINEA, fichero) != NULL)
+                {
+                    char usuarioArchivo[MAX_LINEA];
+                    char contrasenaArchivo[MAX_LINEA];
+
+                    sscanf(linea, "%s %s", usuarioArchivo, contrasenaArchivo);
+
+                    if (strcmp(usuarioArchivo, jugador) == 0)
+                    {
+                        vjugadores[i].usuario = jugador;
+                        vjugadores[i].contraseña = "";
+                        vjugadores[i].estado = 1; // Conectado con usuario
+                        vjugadores[i].turno = false;
+                        vjugadores[i].suma = 0;
+                        vjugadores[i].quiereOtraCarta = false;
+                        vjugadores[i].identificadorPartida = -1;
+                        vjugadores[i].identificadorUsuario = id;
+                        fclose(fichero);
+                        return 3; // El usuario es correcto y se ha introducido el juagdor en el vector
+                    }
+                }*/
+
+        while (fgets(linea, MAX_LINEA, fichero) != NULL)
+        {
+            char usuarioArchivo[MAX_LINEA];
+            char contrasenaArchivo[MAX_LINEA];
+
+            sscanf(linea, "%s %s", usuarioArchivo, contrasenaArchivo);
+
+            if (strcmp(usuarioArchivo, jugador) == 0)
+            {
+                struct jugadores j;
+                j.usuario = jugador;
+                j.contraseña = "";
+                j.estado = 1; // Conectado con usuario
+                j.turno = false;
+                j.suma = 0;
+                j.quiereOtraCarta = false;
+                j.identificadorPartida = -1;
+                j.identificadorUsuario = id;
+                vjugadores.push_back(j);
+                fclose(fichero);
+                return 3; // El usuario es correcto y se ha introducido el jugador en el vector
+            }
         }
+
+        fclose(fichero);
+        return 2; // El usuario introducido no es correcto
+    }
+    else
+    {
+        fclose(fichero);
+        return 1; // No hay espacio en el vector para que se introduzca
     }
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 // COMPRUEBA QUE EL JUGADOR HA INTRODUCIDO LA CONTRASEÑA CORRECTA Y LO INTRODUCE EN EL VECTOR
 bool IntroducirContraseña(vector<struct jugadores> vjugadores, int id, const char *contrasena)
 {
@@ -122,17 +179,12 @@ bool IntroducirContraseña(vector<struct jugadores> vjugadores, int id, const ch
                 char usuarioArchivo[MAX_LINEA];
                 char contrasenaArchivo[MAX_LINEA];
 
-                sscanf(linea, "%s;%s", usuarioArchivo, contrasenaArchivo);
+                sscanf(linea, "%s %s", usuarioArchivo, contrasenaArchivo);
 
                 if ((strcmp(usuarioArchivo, vjugadores[i].usuario.c_str()) == 0) && (strcmp(contrasenaArchivo, contrasena) == 0))
                 {
                     vjugadores[i].contraseña = contrasena;
-                    vjugadores[i].estado = 2;
-                    vjugadores[i].turno = false;
-                    vjugadores[i].suma = 0;
-                    vjugadores[i].quiereOtraCarta = false;
-                    vjugadores[i].identificadorPartida = -1;
-                    vjugadores[i].identificadorUsuario = id;
+                    vjugadores[i].estado = 2; // Conectado con la contraseña
                     fclose(fichero);
                     return true;
                 }
@@ -144,7 +196,6 @@ bool IntroducirContraseña(vector<struct jugadores> vjugadores, int id, const ch
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-
 // REGISTRA A UN JUGADOR AL FICHERO DE TEXTO Y COMPRUEBA QUE NO ESTÁ EN EL FICHERO
 bool RegistrarJugadorFichero(char *jugador, char *contrasena)
 {
@@ -164,7 +215,7 @@ bool RegistrarJugadorFichero(char *jugador, char *contrasena)
         char usuarioArchivo[MAX_LINEA];
         char contrasenaArchivo[MAX_LINEA];
 
-        sscanf(linea, "%s;%s", usuarioArchivo, contrasenaArchivo);
+        sscanf(linea, "%s %s", usuarioArchivo, contrasenaArchivo);
 
         if (strcmp(usuarioArchivo, jugador) == 0)
         {
@@ -187,14 +238,20 @@ bool RegistrarJugadorFichero(char *jugador, char *contrasena)
         return false;
     }
 
-    fprintf(fichero, "%s;%s\n", jugador, contrasena); // Escribir el nuevo usuario seguido de ; y su contrasena
+    fprintf(fichero, "%s %s\n", jugador, contrasena); // Escribir el nuevo usuario seguido de espacio y su contrasena
 
     fclose(fichero);
     return true;
 }
 
-// ELIMINA UN JUGADOR DEL VECTOR CUANDO HA JUGADO TODAS LAS PARTIDAS (10)
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+// HACER UN BUCLE HASTA QUE EL JUGADOR QUE QUIERE INICIAR PARTIDA ENCUENTRE A OTRO
+bool BuscarOponente(vector<struct jugadores> &vjugadores, int id)
+{
+}
 
+
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 // ELIMINA UN JUGADOR DEL VECTOR CUANDO SE DESCONECTA
 
 #endif
