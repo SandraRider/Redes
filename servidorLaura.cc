@@ -1,4 +1,4 @@
-//Esto es servidor.cc
+// Esto es servidor.cc
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <vector>
 
-#include "servidor.hpp"
+#include "servidor2.hpp"
 
 #define MSG_SIZE 250
 #define MAX_CLIENTS 50
@@ -48,6 +48,8 @@ int main()
     int on, ret;
 
     vector<struct jugadores> vjugadores;
+    vector<struct partidas> vpartidas;
+    vector<struct barajas> vbaraja;
     // Esto también podría ponerlo en su lugar, es también un vector:
     // struct jugadores vjugadores[30];
 
@@ -158,12 +160,14 @@ int main()
                                 }*/
 
                                 // Tampoco necesito la función de añadir jugadores
-                                //AnadirJugador(vjugadores, new_sd);
-                                
+                                // AnadirJugador(vjugadores, new_sd);
+
                                 jugadores u;
-                                //u.socket = new_sd;
-                                //u.estado = "conectado";
+                                // u.socket = new_sd;
+                                // u.estado = "conectado";
                                 vjugadores.push_back(u);
+                                //meterJugadorEnPartida(vjugadores, i, vpartidas, vbaraja);
+
                             }
                             else
                             {
@@ -206,43 +210,157 @@ int main()
 
                         if (recibidos > 0)
                         {
-
+                            /*---------------------------------------------------------------------------------------------------------------------------------------------------*/
+                            /* SALIR */
                             if (strcmp(buffer, "SALIR\n") == 0)
                             {
-                                //Este if es cuando le mandemos al servidor que queremos salir
+                                // Este if es cuando le mandemos al servidor que queremos salir
                                 salirCliente(i, &readfds, &numClientes, arrayClientes);
                             }
+                            /*---------------------------------------------------------------------------------------------------------------------------------------------------*/
+                            /* INICIAR SESIÓN USUARIO (INTRODUCE EL USUARIO Y SI HAY HUECO LO INTRODUCE EN EL VECTOR) */
                             else if (strncmp(buffer, "USUARIO ", strlen("USUARIO ")) == 0)
                             {
                                 // Cojo el nombre del usuario
                                 char jugador[250];
                                 sscanf(buffer, "USUARIO %s", jugador);
+                                int introducir=IntroducirUsuarioRegistrado(vjugadores, i, jugador);
 
-                                //// Comprobamos que el socket tiene estado para introducir USUARIO
-                                if (comprobarConexiones(vjugadores, i) == true)
-                                {
-                                    if (ExisteJugador(vjugadores, i, jugador) == true)
-                                    {
-                                        bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "+OK, USUARIO, %s correcto, introduzca la contraseña", jugador);
-                                        send(i, buffer, sizeof(buffer), 0);
-                                    }
-                                    else
-                                    {
-                                        bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "+ERR, USUARIO, %s no encontrado", jugador);
-                                        send(i, buffer, sizeof(buffer), 0);
-                                    }
-                                } //Mensaje de error si no lo está:
-                                else
+                                if (introducir == 3) // El usuario es correcto y se ha introducido el juagdor en el vector
                                 {
                                     bzero(buffer, sizeof(buffer));
-                                    sprintf(buffer, "+ERR, tu estado no te permite enviar este mensaje");
+                                    sprintf(buffer, "+OK, USUARIO correcto.");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
+                                else if (introducir == 2) // El usuario que ha introducido el jugador es incorrecto
+                                {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-ERR, USUARIO incorrecto.");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
+                                else if (introducir == 1) // No hay espacio en el vector para que se introduzca
+                                {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-ERR, demasiados clientes conectados.");
                                     send(i, buffer, sizeof(buffer), 0);
                                 }
                             }
+                            /*---------------------------------------------------------------------------------------------------------------------------------------------------*/
+                            /* INTRODUCIR CONTRASEÑA */
                             else if (strncmp(buffer, "PASSWORD ", strlen("PASSWORD ")) == 0)
                             {
+
+                                char contrasena[250];
+                                sscanf(buffer, "PASSWORD %s", contrasena);
+
+                                if (IntroducirContraseña(vjugadores, i, contrasena) == true) // La contraseña es correcto y se actualiza el estado a 2
+                                {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "+OK, usuario validado");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
+                                else // La contraseña que ha introducido el jugador es incorrecta
+                                {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-ERR, error en la validacion");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
+                            }
+                            /*---------------------------------------------------------------------------------------------------------------------------------------------------*/
+                            /* REGISTRARSE UN USUARIO NUEVO (METERLO EN EL FICHERO DE TEXTO) */
+                            else if (strncmp(buffer, "REGISTRO ", strlen("REGISTRO ")) == 0)
+                            {
+
+                                char contrasena[250];
+                                char usuario[250];
+                                sscanf(buffer, "REGISTRO -u %s -p %s", usuario, contrasena);
+
+                                if (RegistrarJugadorFichero(usuario, contrasena) == true) // El usuario ha sido registrado en el fichero de texto
+                                {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "+OK, usuario registrado correctamente");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
+                                else // El usuario introducido ya esta en el fichero de texto
+                                {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-ERR, el nombre de usuario ya ha sido utilizado");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
+                            }
+                            /*---------------------------------------------------------------------------------------------------------------------------------------------------*/
+                            /* INICIAR PARTIDA (HACER) */
+                            else if (strncmp(buffer, "INICIAR-PARTIDA", strlen("INICIAR-PARTIDA")) == 0)
+                            {
+                                //IniciarPartida(vjugadores, i, vpartidas);
+                                int aux;
+                                int j;
+                                int b;
+                                aux=meterJugadorEnPartida(vjugadores, i, vpartidas, vbaraja, j, b);
+                                if(aux==1)
+                                {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-Empezando partida");
+                                    send(i, buffer, sizeof(buffer), 0);
+
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-Empezando partida");
+                                    send(j, buffer, sizeof(buffer), 0);
+
+                                    asignarCarta(vjugadores, i, vbaraja, b);
+                                    asignarCarta(vjugadores, i, vbaraja, b);
+                                    //Decirle al jugador 1 que cartas tiene
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-Tus cartas son:");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                    for(int c=0; c<vjugadores[i].cartas.size(); c++)
+                                    {
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "%s", vjugadores[i].cartas[c]);
+                                        send(i, buffer, sizeof(buffer), 0);
+                                    }
+
+                                    asignarCarta(vjugadores, j, vbaraja, b);
+                                    asignarCarta(vjugadores, j, vbaraja, b);
+                                    //Decirle al jugador 1 que cartas tiene
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-Tus cartas son:");
+                                    send(j, buffer, sizeof(buffer), 0);
+                                    for(int c=0; c<vjugadores[j].cartas.size(); c++)
+                                    {
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "%s", vjugadores[j].cartas[c]);
+                                        send(j, buffer, sizeof(buffer), 0);
+                                    }
+
+                                }else if(aux==2)
+                                {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-Esperando a otro jugador");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
+                                //printf("%s", vpartidas[1].jugador1.usuario);
+                                //printf("%s", vpartidas[1].jugador2.usuario);
+                                //printf("%d", vpartidas.size());
+                                //printf("hola");
+                            }
+                            /*---------------------------------------------------------------------------------------------------------------------------------------------------*/
+                            /* PEDIR CARTA (HACER) */
+                            else if (strncmp(buffer, "PEDIR-CARTA", strlen("PEDIR-CARTA")) == 0)
+                            {
+
+                            }
+                            /*---------------------------------------------------------------------------------------------------------------------------------------------------*/
+                            /* PLANTARME (HACER) */
+                            else if (strncmp(buffer, "PLANTARME", strlen("PLANTARME")) == 0)
+                            {
+                            }
+                            else
+                            {
+                                bzero(buffer, sizeof(buffer));
+                                sprintf(buffer, "-ERR, no te permite enviar este mensaje");
+                                send(i, buffer, sizeof(buffer), 0);
+                                /*-------------------------------------------------------------------------------------------------------------------------------------------------*/
                             }
 
                             /* Esto no:
