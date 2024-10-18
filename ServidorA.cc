@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <vector>
 
-#include "servidorLaura.hpp"
+#include "ServidorA.hpp"
 
 #define MSG_SIZE 250
 #define MAX_CLIENTS 50
