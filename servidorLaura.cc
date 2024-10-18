@@ -162,10 +162,10 @@ int main()
                                 // Tampoco necesito la función de añadir jugadores
                                 // AnadirJugador(vjugadores, new_sd);
 
-                                jugadores u;
+                                //jugadores u;
                                 // u.socket = new_sd;
                                 // u.estado = "conectado";
-                                vjugadores.push_back(u);
+                                //vjugadores.push_back(u);
                                 //meterJugadorEnPartida(vjugadores, i, vpartidas, vbaraja);
 
                             }
@@ -231,6 +231,12 @@ int main()
                                     bzero(buffer, sizeof(buffer));
                                     sprintf(buffer, "+OK, USUARIO correcto.");
                                     send(i, buffer, sizeof(buffer), 0);
+
+                                    for(int h=0; h<vjugadores.size(); h++)
+                                    {
+                                        printf("a: %d\n",vjugadores[h].identificadorUsuario);
+                                        printf("sice; %d\n", vjugadores.size());
+                                    }
                                 }
                                 else if (introducir == 2) // El usuario que ha introducido el jugador es incorrecto
                                 {
@@ -296,9 +302,11 @@ int main()
                                 int aux;
                                 int j;
                                 int b;
-                                aux=meterJugadorEnPartida(vjugadores, i, vpartidas, vbaraja, j, b);
+                                aux=meterJugadorEnPartida(vjugadores, i, vpartidas, vbaraja, &j, &b);
+                                printf("bbb. b: %d, j: %d\n", b, j);
                                 if(aux==1)
                                 {
+                                    printf("ccc. b: %d, j: %d\n", b, j);
                                     bzero(buffer, sizeof(buffer));
                                     sprintf(buffer, "-Empezando partida");
                                     send(i, buffer, sizeof(buffer), 0);
@@ -306,6 +314,7 @@ int main()
                                     bzero(buffer, sizeof(buffer));
                                     sprintf(buffer, "-Empezando partida");
                                     send(j, buffer, sizeof(buffer), 0);
+                                    printf("AAA. b: %d, j: %d\n", b, j);
 
                                     asignarCarta(vjugadores, i, vbaraja, b);
                                     asignarCarta(vjugadores, i, vbaraja, b);
@@ -319,7 +328,7 @@ int main()
                                         sprintf(buffer, "%s", vjugadores[i].cartas[c]);
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
-
+                                    printf("b: %d, j: %d", b, j);
                                     asignarCarta(vjugadores, j, vbaraja, b);
                                     asignarCarta(vjugadores, j, vbaraja, b);
                                     //Decirle al jugador 1 que cartas tiene
