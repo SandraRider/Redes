@@ -70,6 +70,68 @@ bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
     return false;
 }
 
+struct barajas crearBaraja()
+{
+    struct barajas b;
+    b.cartaBaraja.push_back("As de Corazones");
+    b.cartaBaraja[1] = "2 de Corazones";
+    b.cartaBaraja[2] = "3 de Corazones";
+    b.cartaBaraja[3] = "4 de Corazones";
+    b.cartaBaraja[4] = "5 de Corazones";
+    b.cartaBaraja[5] = "6 de Corazones";
+    b.cartaBaraja[6] = "7 de Corazones";
+    b.cartaBaraja[7] = "8 de Corazones";
+    b.cartaBaraja[8] = "9 de Corazones";
+    b.cartaBaraja[9] = "10 de Corazones";
+    b.cartaBaraja[10] = "Jota de Corazones";
+    b.cartaBaraja[11] = "Reina de Corazones";
+    b.cartaBaraja[12] = "Rey de Corazones";
+
+    b.cartaBaraja[13] = "As de Diamantes";
+    b.cartaBaraja[14] = "2 de Diamantes";
+    b.cartaBaraja[15] = "3 de Diamantes";
+    b.cartaBaraja[16] = "4 de Diamantes";
+    b.cartaBaraja[17] = "5 de Diamantes";
+    b.cartaBaraja[18] = "6 de Diamantes";
+    b.cartaBaraja[19] = "7 de Diamantes";
+    b.cartaBaraja[20] = "8 de Diamantes";
+    b.cartaBaraja[21] = "9 de Diamantes";
+    b.cartaBaraja[22] = "10 de Diamantes";
+    b.cartaBaraja[23] = "Jota de Diamantes";
+    b.cartaBaraja[24] = "Reina de Diamantes";
+    b.cartaBaraja[25] = "Rey de Diamantes";
+
+    b.cartaBaraja[26] = "As de Treboles";
+    b.cartaBaraja[27] = "2 de Treboles";
+    b.cartaBaraja[28] = "3 de Treboles";
+    b.cartaBaraja[29] = "4 de Treboles";
+    b.cartaBaraja[30] = "5 de Treboles";
+    b.cartaBaraja[31] = "6 de Treboles";
+    b.cartaBaraja[32] = "7 de Treboles";
+    b.cartaBaraja[33] = "8 de Treboles";
+    b.cartaBaraja[34] = "9 de Treboles";
+    b.cartaBaraja[35] = "10 de Treboles";
+    b.cartaBaraja[36] = "Jota de Treboles";
+    b.cartaBaraja[37] = "Reina de Treboles";
+    b.cartaBaraja[38] = "Rey de Treboles";
+
+    b.cartaBaraja[39] = "As de Picas";
+    b.cartaBaraja[40] = "2 de Picas";
+    b.cartaBaraja[41] = "3 de Picas";
+    b.cartaBaraja[42] = "4 de Picas";
+    b.cartaBaraja[43] = "5 de Picas";
+    b.cartaBaraja[44] = "6 de Picas";
+    b.cartaBaraja[45] = "7 de Picas";
+    b.cartaBaraja[46] = "8 de Picas";
+    b.cartaBaraja[47] = "9 de Picas";
+    b.cartaBaraja[48] = "10 de Picas";
+    b.cartaBaraja[49] = "Jota de Picas";
+    b.cartaBaraja[50] = "Reina de Picas";
+    b.cartaBaraja[51] = "Rey de Picas";
+    return b;
+}
+
+
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
 // COMPRUEBA QUE EL JUGADOR ESTÁ CONECTADO CON SU USUARIO (PARA QUE EL USUARIO PUEDA METER SU CONTRASENA)
 bool ConectadoConUsuario(vector<struct jugadores> &vjugadores, int id, const char *jugador)
@@ -257,7 +319,7 @@ bool BuscarOponente(vector<struct jugadores> &vjugadores, int id)
 }
 */
 
-int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, vector<struct barajas> &vbaraja, int id2, int b)
+int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, vector<struct barajas> &vbaraja, int *id2, int *b)
 {
     //Comprueba si hay un jugador solo esperando pareja
     for(int i=0; i<vpartidas.size(); i++)
@@ -267,8 +329,8 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
             printf("hola1\n");
             for(int j=0; j<vjugadores.size(); j++)
             {
-                printf("%d\n", id);
-                printf("%d\n", vjugadores[j].identificadorUsuario);
+                printf("SEGUNDO JUGADOR %d\n", id);
+                printf("SEGUNDO JUGADOR %d\n", vjugadores[j].identificadorUsuario);
                 if(vjugadores[j].identificadorUsuario == id)
                 {
                     printf("hola2\n");
@@ -276,24 +338,31 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
                     vpartidas[i].jugador1.suma=0;
                     vpartidas[i].jugador2.suma=0;
                     //crear baraja
-                    struct barajas crearBaraja(vector<struct barajas> vbaraja);
+                    printf("hola3\n");
+                    struct barajas c=crearBaraja();
+                    printf("Carta de B: %s", c.cartaBaraja[0]);
+                    vbaraja.push_back(c);
+                    printf("Tamano: %d\n",vbaraja.size());
                     vpartidas[i].baraja=vbaraja[vbaraja.size()];
                     vpartidas[i].baraja.identificadorBaraja=vbaraja.size();
-                    b=vpartidas[i].baraja.identificadorBaraja;
+                    (*b)=vpartidas[i].baraja.identificadorBaraja;
                     //Cambiar el estado a jugando (4) del jugador 1
+                    printf("hola4\n");
                     for(int j2=0; j2<vjugadores.size(); j2++)
                     {
                         if(vjugadores[j2].identificadorUsuario == vpartidas[i].jugador1.identificadorUsuario)
                         {
                             vjugadores[j2].estado=4;
-                            id2=vjugadores[j2].identificadorUsuario;
+                            (*id2)=vjugadores[j2].identificadorUsuario;
                         }
                     }
+                    printf("hola5\n");
                     //Cambiar el estado a jugando (4) y el identificador de la partida del jugador 2
                     vjugadores[j].estado = 4;
                     vjugadores[j].identificadorPartida = i;
+                    return 1;
                 }
-                return 1;
+                
             }
         }
     }
@@ -305,11 +374,11 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
         {
             if(vjugadores[j].identificadorUsuario == id)
             {
-                printf("%d\n", vjugadores[j].identificadorUsuario);
+                printf("pRIMER JUGADOR; %d\n", vjugadores[j].identificadorUsuario);
                 vjugadores[j].estado = 3;
                 vjugadores[j].identificadorPartida = vpartidas.size();
-                printf("%d\n", vjugadores[j].estado);
-                printf("%d\n", vjugadores[j].identificadorPartida);
+                printf("pRIMER JUGADOR;%d\n", vjugadores[j].estado);
+                printf("pRIMER JUGADOR;%d\n", vjugadores[j].identificadorPartida);
                 printf("\n");
                 p.jugador1 = vjugadores[j];
             }
@@ -375,65 +444,6 @@ void asignarCarta(vector<struct jugadores> &vjugadores, int i, vector<struct bar
     vbaraja[b].cartaBaraja.erase(vbaraja[b].cartaBaraja.begin()+numero);
 }
 
-struct barajas crearBaraja(vector<struct barajas> &vbaraja)
-{
-    struct barajas b;
-    b.cartaBaraja[0] = "As de Corazones";
-    b.cartaBaraja[1] = "2 de Corazones";
-    b.cartaBaraja[2] = "3 de Corazones";
-    b.cartaBaraja[3] = "4 de Corazones";
-    b.cartaBaraja[4] = "5 de Corazones";
-    b.cartaBaraja[5] = "6 de Corazones";
-    b.cartaBaraja[6] = "7 de Corazones";
-    b.cartaBaraja[7] = "8 de Corazones";
-    b.cartaBaraja[8] = "9 de Corazones";
-    b.cartaBaraja[9] = "10 de Corazones";
-    b.cartaBaraja[10] = "Jota de Corazones";
-    b.cartaBaraja[11] = "Reina de Corazones";
-    b.cartaBaraja[12] = "Rey de Corazones";
 
-    b.cartaBaraja[13] = "As de Diamantes";
-    b.cartaBaraja[14] = "2 de Diamantes";
-    b.cartaBaraja[15] = "3 de Diamantes";
-    b.cartaBaraja[16] = "4 de Diamantes";
-    b.cartaBaraja[17] = "5 de Diamantes";
-    b.cartaBaraja[18] = "6 de Diamantes";
-    b.cartaBaraja[19] = "7 de Diamantes";
-    b.cartaBaraja[20] = "8 de Diamantes";
-    b.cartaBaraja[21] = "9 de Diamantes";
-    b.cartaBaraja[22] = "10 de Diamantes";
-    b.cartaBaraja[23] = "Jota de Diamantes";
-    b.cartaBaraja[24] = "Reina de Diamantes";
-    b.cartaBaraja[25] = "Rey de Diamantes";
-
-    b.cartaBaraja[26] = "As de Treboles";
-    b.cartaBaraja[27] = "2 de Treboles";
-    b.cartaBaraja[28] = "3 de Treboles";
-    b.cartaBaraja[29] = "4 de Treboles";
-    b.cartaBaraja[30] = "5 de Treboles";
-    b.cartaBaraja[31] = "6 de Treboles";
-    b.cartaBaraja[32] = "7 de Treboles";
-    b.cartaBaraja[33] = "8 de Treboles";
-    b.cartaBaraja[34] = "9 de Treboles";
-    b.cartaBaraja[35] = "10 de Treboles";
-    b.cartaBaraja[36] = "Jota de Treboles";
-    b.cartaBaraja[37] = "Reina de Treboles";
-    b.cartaBaraja[38] = "Rey de Treboles";
-
-    b.cartaBaraja[39] = "As de Picas";
-    b.cartaBaraja[40] = "2 de Picas";
-    b.cartaBaraja[41] = "3 de Picas";
-    b.cartaBaraja[42] = "4 de Picas";
-    b.cartaBaraja[43] = "5 de Picas";
-    b.cartaBaraja[44] = "6 de Picas";
-    b.cartaBaraja[45] = "7 de Picas";
-    b.cartaBaraja[46] = "8 de Picas";
-    b.cartaBaraja[47] = "9 de Picas";
-    b.cartaBaraja[48] = "10 de Picas";
-    b.cartaBaraja[49] = "Jota de Picas";
-    b.cartaBaraja[50] = "Reina de Picas";
-    b.cartaBaraja[51] = "Rey de Picas";
-    vbaraja.push_back(b);
-}
 
 #endif
