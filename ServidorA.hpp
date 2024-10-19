@@ -506,6 +506,185 @@ void asignarCarta(vector<struct jugadores> &vjugadores, int id, vector<struct ba
     }
 }
 
+int calcularSuma(vector<struct jugadores> &vjugadores, int i)
+{
+    int ident;
+    for (int a = 0; a < vjugadores.size(); a++)
+    {
+        if (vjugadores[a].identificadorUsuario == i)
+        {
+            ident=a;
+            vjugadores[a].suma = 0;
+            for (int j = 0; j < vjugadores[a].cartas.size(); j++)
+            {
+                // Corazones
+                if (vjugadores[a].cartas[j] == "2 de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 2;
+                }
+                else if (vjugadores[a].cartas[j] == "3 de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 3;
+                }
+                else if (vjugadores[a].cartas[j] == "4 de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 4;
+                }
+                else if (vjugadores[a].cartas[j] == "5 de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 5;
+                }
+                else if (vjugadores[a].cartas[j] == "6 de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 6;
+                }
+                else if (vjugadores[a].cartas[j] == "7 de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 7;
+                }
+                else if (vjugadores[a].cartas[j] == "8 de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 8;
+                }
+                else if (vjugadores[a].cartas[j] == "9 de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 9;
+                }
+                else if (vjugadores[a].cartas[j] == "10 de Corazones" || vjugadores[a].cartas[j] == "Jota de Corazones" || vjugadores[a].cartas[j] == "Reina de Corazones" || vjugadores[a].cartas[j] == "Rey de Corazones")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 10;
+                } // Diamantes
+                else if (vjugadores[a].cartas[j] == "2 de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 2;
+                }
+                else if (vjugadores[a].cartas[j] == "3 de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 3;
+                }
+                else if (vjugadores[a].cartas[j] == "4 de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 4;
+                }
+                else if (vjugadores[a].cartas[j] == "5 de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 5;
+                }
+                else if (vjugadores[a].cartas[j] == "6 de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 6;
+                }
+                else if (vjugadores[a].cartas[j] == "7 de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 7;
+                }
+                else if (vjugadores[a].cartas[j] == "8 de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 8;
+                }
+                else if (vjugadores[a].cartas[j] == "9 de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 9;
+                }
+                else if (vjugadores[a].cartas[j] == "10 de Diamantes" || vjugadores[a].cartas[j] == "Jota de Diamantes" || vjugadores[a].cartas[j] == "Reina de Diamantes" || vjugadores[a].cartas[j] == "Rey de Diamantes")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 10;
+                }
+                // Tréboles
+                else if (vjugadores[a].cartas[j] == "2 de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 2;
+                }
+                else if (vjugadores[a].cartas[j] == "3 de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 3;
+                }
+                else if (vjugadores[a].cartas[j] == "4 de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 4;
+                }
+                else if (vjugadores[a].cartas[j] == "5 de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 5;
+                }
+                else if (vjugadores[a].cartas[j] == "6 de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 6;
+                }
+                else if (vjugadores[a].cartas[j] == "7 de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 7;
+                }
+                else if (vjugadores[a].cartas[j] == "8 de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 8;
+                }
+                else if (vjugadores[a].cartas[j] == "9 de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 9;
+                }
+                else if (vjugadores[a].cartas[j] == "10 de Treboles" || vjugadores[a].cartas[j] == "Jota de Treboles" || vjugadores[a].cartas[j] == "Reina de Treboles" || vjugadores[a].cartas[j] == "Rey de Treboles")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 10;
+                }
+                // Picas
+                else if (vjugadores[a].cartas[j] == "2 de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 2;
+                }
+                else if (vjugadores[a].cartas[j] == "3 de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 3;
+                }
+                else if (vjugadores[a].cartas[j] == "4 de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 4;
+                }
+                else if (vjugadores[a].cartas[j] == "5 de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 5;
+                }
+                else if (vjugadores[a].cartas[j] == "6 de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 6;
+                }
+                else if (vjugadores[a].cartas[j] == "7 de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 7;
+                }
+                else if (vjugadores[a].cartas[j] == "8 de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 8;
+                }
+                else if (vjugadores[a].cartas[j] == "9 de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 9;
+                }
+                else if (vjugadores[a].cartas[j] == "10 de Picas" || vjugadores[a].cartas[j] == "Jota de Picas" || vjugadores[a].cartas[j] == "Reina de Picas" || vjugadores[a].cartas[j] == "Rey de Picas")
+                {
+                    vjugadores[a].suma = vjugadores[a].suma + 10;
+                }
+            }
+            // Ahora un for para los As
+            for (int j = 0; j < vjugadores[a].cartas.size(); j++)
+            {
+                if (vjugadores[a].cartas[j] == "As de Corazones" || vjugadores[a].cartas[j] == "As de Diamantes" || vjugadores[a].cartas[j] == "As de Treboles" || vjugadores[a].cartas[j] == "As de Picas")
+                {
+                    if (vjugadores[a].suma + 11 > 21)
+                    {
+                        vjugadores[a].suma = vjugadores[a].suma + 1;
+                    }
+                    else
+                    {
+                        vjugadores[a].suma = vjugadores[a].suma + 11;
+                    }
+                }
+            }
+        }
+    }
+    return vjugadores[ident].suma;
+}
+
 /*void asignarCarta(vector<struct jugadores> &vjugadores, int i, vector<struct barajas> &vbaraja, int b)
 {
     int tam = vbaraja[b].cartaBaraja.size();
