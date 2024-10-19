@@ -37,7 +37,7 @@ int main()
         servidor y el puerto del servicio que solicitamos
     -------------------------------------------------------------------*/
     sockname.sin_family = AF_INET;
-    sockname.sin_port = htons(2000);
+    sockname.sin_port = htons(2060);
     sockname.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     /* ------------------------------------------------------------------
@@ -71,15 +71,26 @@ int main()
         {
 
             bzero(buffer, sizeof(buffer));
-            recv(sd, buffer, sizeof(buffer), 0);
+            int bytesRecibidos = recv(sd, buffer, sizeof(buffer), 0);
 
-            printf("\n%s\n", buffer);
-
-            if (strcmp(buffer, "Demasiados clientes conectados\n") == 0)
+            if (bytesRecibidos == 0)
+            {
+                printf("El servidor de BlackJack se ha apagado.\n\n");
                 fin = 1;
+            }
+            else if (bytesRecibidos > 0)
+            {
+                printf("\n%s\n", buffer);
 
-            if (strcmp(buffer, "Desconexión servidor\n") == 0)
-                fin = 1;
+                if (strcmp(buffer, "Demasiados clientes conectados\n") == 0)
+                    fin = 1;
+
+                if (strcmp(buffer, "El servidor de BlackJack se ha apagado.\n") == 0)
+                    fin = 1;
+
+                if (strcmp(buffer, "Desconexión servidor\n") == 0)
+                    fin = 1;
+            }
         }
         else
         {

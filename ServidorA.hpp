@@ -15,19 +15,21 @@ using namespace std;
 
 /* El fichero .txt se guarda como usuario contrasena */
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+// STRUCTS
 struct jugadores
 {
     string usuario;
     string contraseña;
-    bool turno;
+    bool turno; // Si es el turno del jugador (turno = true) o si es el turno del oponente (turno = false)
     int estado; // 0 = no conectado, 1 = usuario conectado, 2 = contraseña bien, 3 = quiere empezar partida y 4 = jugando en una partida
     vector<string> cartas;
-    int suma;
-    // bool quiereOtraCarta;
+    int suma;      // Suma de las cartas que tiene el jugador
+    bool plantado; // Si el jugador se ha plantado (plantado = true) o si no se ha plantado (plantado = false)
     int identificadorPartida;
     int identificadorUsuario;
 };
-struct barajas // Yo pondría un vector con todos los tipos de la baraja posibles
+struct barajas
 {
     vector<string> cartaBaraja;
     int identificadorBaraja;
@@ -39,20 +41,6 @@ struct partidas
     struct barajas baraja;
     int turno;
 };
-
-/*----------------------------------------------------------------------------------------------------------------------------------------*/
-// COMPRUEBA SI EL JUGADOR ESTÁ CONECTADO CON SU USUARIO Y CONTRASEÑA (PARA QUE EL USUARIO PUEDA EMPEZAR UNA PARTIDA)
-bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
-{
-    for (int i = 0; i < vjugadores.size(); i++)
-    {
-        if (vjugadores[i].identificadorUsuario == id && vjugadores[i].estado == 2)
-        {
-            return true;
-        }
-    }
-    return false;
-}
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
 // CREA TODAS LAS CARTAS DE UNA BARAJA
@@ -119,67 +107,6 @@ struct barajas crearBaraja()
     return b;
 }
 
-/*struct barajas crearBaraja()
-{
-    struct barajas b;
-    b.cartaBaraja.push_back("As de Corazones");
-    b.cartaBaraja[1] = "2 de Corazones";
-    b.cartaBaraja[2] = "3 de Corazones";
-    b.cartaBaraja[3] = "4 de Corazones";
-    b.cartaBaraja[4] = "5 de Corazones";
-    b.cartaBaraja[5] = "6 de Corazones";
-    b.cartaBaraja[6] = "7 de Corazones";
-    b.cartaBaraja[7] = "8 de Corazones";
-    b.cartaBaraja[8] = "9 de Corazones";
-    b.cartaBaraja[9] = "10 de Corazones";
-    b.cartaBaraja[10] = "Jota de Corazones";
-    b.cartaBaraja[11] = "Reina de Corazones";
-    b.cartaBaraja[12] = "Rey de Corazones";
-
-    b.cartaBaraja[13] = "As de Diamantes";
-    b.cartaBaraja[14] = "2 de Diamantes";
-    b.cartaBaraja[15] = "3 de Diamantes";
-    b.cartaBaraja[16] = "4 de Diamantes";
-    b.cartaBaraja[17] = "5 de Diamantes";
-    b.cartaBaraja[18] = "6 de Diamantes";
-    b.cartaBaraja[19] = "7 de Diamantes";
-    b.cartaBaraja[20] = "8 de Diamantes";
-    b.cartaBaraja[21] = "9 de Diamantes";
-    b.cartaBaraja[22] = "10 de Diamantes";
-    b.cartaBaraja[23] = "Jota de Diamantes";
-    b.cartaBaraja[24] = "Reina de Diamantes";
-    b.cartaBaraja[25] = "Rey de Diamantes";
-
-    b.cartaBaraja[26] = "As de Treboles";
-    b.cartaBaraja[27] = "2 de Treboles";
-    b.cartaBaraja[28] = "3 de Treboles";
-    b.cartaBaraja[29] = "4 de Treboles";
-    b.cartaBaraja[30] = "5 de Treboles";
-    b.cartaBaraja[31] = "6 de Treboles";
-    b.cartaBaraja[32] = "7 de Treboles";
-    b.cartaBaraja[33] = "8 de Treboles";
-    b.cartaBaraja[34] = "9 de Treboles";
-    b.cartaBaraja[35] = "10 de Treboles";
-    b.cartaBaraja[36] = "Jota de Treboles";
-    b.cartaBaraja[37] = "Reina de Treboles";
-    b.cartaBaraja[38] = "Rey de Treboles";
-
-    b.cartaBaraja[39] = "As de Picas";
-    b.cartaBaraja[40] = "2 de Picas";
-    b.cartaBaraja[41] = "3 de Picas";
-    b.cartaBaraja[42] = "4 de Picas";
-    b.cartaBaraja[43] = "5 de Picas";
-    b.cartaBaraja[44] = "6 de Picas";
-    b.cartaBaraja[45] = "7 de Picas";
-    b.cartaBaraja[46] = "8 de Picas";
-    b.cartaBaraja[47] = "9 de Picas";
-    b.cartaBaraja[48] = "10 de Picas";
-    b.cartaBaraja[49] = "Jota de Picas";
-    b.cartaBaraja[50] = "Reina de Picas";
-    b.cartaBaraja[51] = "Rey de Picas";
-    return b;
-}*/
-
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
 // COMPRUEBA QUE EL JUGADOR ESTÁ CONECTADO CON SU USUARIO (PARA QUE EL USUARIO PUEDA METER SU CONTRASENA)
 bool ConectadoConUsuario(vector<struct jugadores> &vjugadores, int id, const char *jugador)
@@ -187,6 +114,20 @@ bool ConectadoConUsuario(vector<struct jugadores> &vjugadores, int id, const cha
     for (int i = 0; i < vjugadores.size(); i++)
     {
         if ((vjugadores[i].identificadorUsuario == id) && (strcmp(vjugadores[i].usuario.c_str(), jugador) == 0))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+// COMPRUEBA SI EL JUGADOR ESTÁ CONECTADO CON SU USUARIO Y CONTRASEÑA (PARA QUE EL USUARIO PUEDA EMPEZAR UNA PARTIDA)
+bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
+{
+    for (int i = 0; i < vjugadores.size(); i++)
+    {
+        if (vjugadores[i].identificadorUsuario == id && vjugadores[i].estado >= 2)
         {
             return true;
         }
@@ -236,10 +177,10 @@ int IntroducirUsuarioRegistrado(vector<struct jugadores> &vjugadores, int id, co
                 j.estado = 1; // Conectado con usuario
                 j.turno = false;
                 j.suma = 0;
-                // j.quiereOtraCarta = false;
+                j.plantado = false;
                 j.identificadorPartida = -1;
                 j.identificadorUsuario = id;
-                printf("%d\n", j.identificadorUsuario);
+                // printf("%d\n", j.identificadorUsuario);
                 vjugadores.push_back(j);
                 fclose(fichero);
                 return 3; // El usuario es correcto y se ha introducido el jugador en el vector
@@ -367,6 +308,8 @@ bool BuscarOponente(vector<struct jugadores> &vjugadores, int id)
 }
 */
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+// METER UN JUGADOR EN UNA PARTIDA
 int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, vector<struct barajas> &vbaraja, int *id2, int *b)
 {
     // Comprueba si hay un jugador solo esperando pareja
@@ -384,7 +327,6 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
                     vpartidas[i].jugador2.suma = 0;
 
                     // Crear baraja
-
                     struct barajas c = crearBaraja();
 
                     vbaraja.push_back(c);
@@ -405,17 +347,14 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
                     // Cambiar el estado a jugando (4) y el identificador de la partida del jugador 2
                     vjugadores[j].estado = 4;
                     vjugadores[j].turno = false;
+                    vjugadores[j].plantado = false;
                     vjugadores[j].identificadorPartida = i;
-                    printf("meterJugadorEnPartida. SEGUNDO JUGADOR id: %d\n", vjugadores[j].identificadorUsuario);
-                    printf("meterJugadorEnPartida. SEGUNDO JUGADOR estado: %d\n", vjugadores[j].estado);
-                    printf("meterJugadorEnPartida. SEGUNDO JUGADOR idPartida: %d\n", vjugadores[j].identificadorPartida);
-                    printf("meterJugadorEnPartida. SEGUNDO JUGADOR turno: %d\n", vjugadores[j].turno);
                     return 1;
                 }
             }
         }
     }
-    // Crea una nueva partida
+    // Crea una nueva partida si hay menos de 10 partidas
     if (vpartidas.size() < 10)
     {
         partidas p;
@@ -425,11 +364,8 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
             {
                 vjugadores[j].estado = 3;
                 vjugadores[j].turno = true;
+                vjugadores[j].plantado = false;
                 vjugadores[j].identificadorPartida = vpartidas.size();
-                printf("meterJugadorEnPartida. PRIMER JUGADOR id: %d\n", vjugadores[j].identificadorUsuario);
-                printf("meterJugadorEnPartida. PRIMER JUGADOR estado: %d\n", vjugadores[j].estado);
-                printf("meterJugadorEnPartida. PRIMER JUGADOR idPartida: %d\n", vjugadores[j].identificadorPartida);
-                printf("meterJugadorEnPartida. PRIMER JUGADOR turno: %d\n", vjugadores[j].turno);
                 p.jugador1 = vjugadores[j];
             }
         }
@@ -440,8 +376,8 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-// ELIMINA UN JUGADOR DEL VECTOR CUANDO SE DESCONECTA
-void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, vector<struct barajas> &vbaraja)
+// ELIMINA UN JUGADOR DEL VECTOR DE JUGADORES CUANDO SE DESCONECTA
+/*void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, vector<struct barajas> &vbaraja)
 {
     // Elimino el vector de la partida
     for (int i = 0; i < vpartidas.size(); i++)
@@ -449,7 +385,7 @@ void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct 
         if (vpartidas[i].jugador1.identificadorUsuario == id)
         {
             vpartidas[i].jugador1.estado = 0;
-            // borrar baraja
+            // Borrar baraja
             for (int j = 0; j < vbaraja.size(); j++)
             {
                 if (vpartidas[i].baraja.identificadorBaraja == vbaraja[j].identificadorBaraja)
@@ -457,12 +393,17 @@ void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct 
                     vbaraja.erase(vbaraja.begin() + j);
                 }
             }
-            vpartidas[i].jugador2.estado = 3;
+            vpartidas[i].jugador2.estado = 2;
+            vpartidas[i].jugador2.plantado = false;
+            vpartidas[i].jugador2.identificadorPartida = -1;
+
+            vpartidas.erase(vpartidas.begin() + i);
         }
+
         if (vpartidas[i].jugador2.identificadorUsuario == id)
         {
             vpartidas[i].jugador2.estado = 0;
-            // borrar baraja
+            // Borrar baraja
             for (int j = 0; j < vbaraja.size(); j++)
             {
                 if (vpartidas[i].baraja.identificadorBaraja == vbaraja[j].identificadorBaraja)
@@ -470,7 +411,11 @@ void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct 
                     vbaraja.erase(vbaraja.begin() + j);
                 }
             }
-            vpartidas[i].jugador1.estado = 3;
+            vpartidas[i].jugador1.estado = 2;
+            vpartidas[i].jugador1.plantado = false;
+            vpartidas[i].jugador1.identificadorPartida = -1;
+
+            vpartidas.erase(vpartidas.begin() + i);
         }
     }
 
@@ -482,39 +427,122 @@ void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct 
             vjugadores.erase(vjugadores.begin() + i);
         }
     }
+}*/
+
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+// ELIMINA UN JUGADOR DEL VECTOR DE JUGADORES CUANDO SE DESCONECTA
+void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, vector<struct barajas> &vbaraja)
+{
+    // Elimino el vector de la partida
+    for (int i = 0; i < vpartidas.size(); i++)
+    {
+        if (vpartidas[i].jugador1.identificadorUsuario == id)
+        {
+            // Borrar baraja
+            for (int j = 0; j < vbaraja.size(); j++)
+            {
+                if (vpartidas[i].baraja.identificadorBaraja == vbaraja[j].identificadorBaraja)
+                {
+                    vbaraja.erase(vbaraja.begin() + j);
+                }
+            }
+
+            vpartidas.erase(vpartidas.begin() + i);
+        }
+
+        if (vpartidas[i].jugador2.identificadorUsuario == id)
+        {
+            // Borrar baraja
+            for (int j = 0; j < vbaraja.size(); j++)
+            {
+                if (vpartidas[i].baraja.identificadorBaraja == vbaraja[j].identificadorBaraja)
+                {
+                    vbaraja.erase(vbaraja.begin() + j);
+                }
+            }
+
+            vpartidas.erase(vpartidas.begin() + i);
+        }
+    }
+
+    // Elimino al jugador del vector jugadores
+    for (int i = 0; i < vjugadores.size(); i++)
+    {
+        if (vjugadores[i].identificadorUsuario == id)
+        {
+            vjugadores.erase(vjugadores.begin() + i);
+        }
+    }
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+// ELIMINA AMBOS JUGADORES DEL VECTOR DE JUGADORES CUANDO ESTÁN EN UNA PARTIDA, LOS ELIMINA DEL VPARTIDA Y VJUGADORES Y BORRA LAS CARTAS DE VBARAJA
+void eliminaJugadoresPartida(vector<struct jugadores> &vjugadores, int id1, int id2, vector<struct partidas> &vpartidas, vector<struct barajas> &vbaraja)
+{
+    for (int i = 0; i < vpartidas.size(); i++)
+    {
+        // Ambos jugadores están en la misma partida
+        if ((vpartidas[i].jugador1.identificadorUsuario == id1 && vpartidas[i].jugador2.identificadorUsuario == id2) ||
+            (vpartidas[i].jugador1.identificadorUsuario == id2 && vpartidas[i].jugador2.identificadorUsuario == id1))
+        {
+            // Eliminamos la baraja asociada a la partida
+            for (int j = 0; j < vbaraja.size(); j++)
+            {
+                if (vpartidas[i].baraja.identificadorBaraja == vbaraja[j].identificadorBaraja)
+                {
+                    vbaraja.erase(vbaraja.begin() + j);
+                }
+            }
+
+            vpartidas.erase(vpartidas.begin() + i); // Eliminamos la partida
+        }
+    }
+
+    // Eliminar a ambos jugadores del vector de jugadores
+    for (int i = 0; i < vjugadores.size();)
+    {
+        if (vjugadores[i].identificadorUsuario == id1 || vjugadores[i].identificadorUsuario == id2)
+        {
+            vjugadores.erase(vjugadores.begin() + i); // Eliminar el jugador
+        }
+        else
+        {
+            i++; // Solo incrementar si no se ha eliminado un jugador
+        }
+    }
+}
+
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+// ASIGNA UNA CARTA RANDOM DEL VECTOR DE CARTAS AL JUGADOR Y LAS INTRODUCE EN SU VECTOR
 void asignarCarta(vector<struct jugadores> &vjugadores, int id, vector<struct barajas> &vbaraja, int b)
 {
-    // printf("AsignarCarta1. i: %d\n", id);
-    // printf("AsignarCarta. B: %d\n", b);
     b--;
     int tam = vbaraja[b].cartaBaraja.size();
-    // printf("AsignarCarta2. tambaraja: %d\n", tam);
     int numero = 0;
-    // printf("AsignarCarta3. numero: %d\n", numero);
     numero = rand() % tam;
 
     for (int i = 0; i < vjugadores.size(); i++)
     {
         if (vjugadores[i].identificadorUsuario == id)
         {
-            // printf("AsignarCarta4. numero: %d\n", numero);
             vjugadores[i].cartas.push_back(vbaraja[b].cartaBaraja[numero]);
             vbaraja[b].cartaBaraja.erase(vbaraja[b].cartaBaraja.begin() + numero);
         }
     }
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+// CALCULA LA SUMA DE LAS CARTAS DE UN JUGADOR
 int calcularSuma(vector<struct jugadores> &vjugadores, int i)
 {
-    int ident;
+    int posvector;
     for (int a = 0; a < vjugadores.size(); a++)
     {
         if (vjugadores[a].identificadorUsuario == i)
         {
-            ident=a;
+            posvector = a;
             vjugadores[a].suma = 0;
+
             for (int j = 0; j < vjugadores[a].cartas.size(); j++)
             {
                 // Corazones
@@ -553,7 +581,9 @@ int calcularSuma(vector<struct jugadores> &vjugadores, int i)
                 else if (vjugadores[a].cartas[j] == "10 de Corazones" || vjugadores[a].cartas[j] == "Jota de Corazones" || vjugadores[a].cartas[j] == "Reina de Corazones" || vjugadores[a].cartas[j] == "Rey de Corazones")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 10;
-                } // Diamantes
+                }
+
+                // Diamantes
                 else if (vjugadores[a].cartas[j] == "2 de Diamantes")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 2;
@@ -591,39 +621,39 @@ int calcularSuma(vector<struct jugadores> &vjugadores, int i)
                     vjugadores[a].suma = vjugadores[a].suma + 10;
                 }
                 // Tréboles
-                else if (vjugadores[a].cartas[j] == "2 de Treboles")
+                else if (vjugadores[a].cartas[j] == "2 de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 2;
                 }
-                else if (vjugadores[a].cartas[j] == "3 de Treboles")
+                else if (vjugadores[a].cartas[j] == "3 de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 3;
                 }
-                else if (vjugadores[a].cartas[j] == "4 de Treboles")
+                else if (vjugadores[a].cartas[j] == "4 de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 4;
                 }
-                else if (vjugadores[a].cartas[j] == "5 de Treboles")
+                else if (vjugadores[a].cartas[j] == "5 de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 5;
                 }
-                else if (vjugadores[a].cartas[j] == "6 de Treboles")
+                else if (vjugadores[a].cartas[j] == "6 de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 6;
                 }
-                else if (vjugadores[a].cartas[j] == "7 de Treboles")
+                else if (vjugadores[a].cartas[j] == "7 de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 7;
                 }
-                else if (vjugadores[a].cartas[j] == "8 de Treboles")
+                else if (vjugadores[a].cartas[j] == "8 de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 8;
                 }
-                else if (vjugadores[a].cartas[j] == "9 de Treboles")
+                else if (vjugadores[a].cartas[j] == "9 de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 9;
                 }
-                else if (vjugadores[a].cartas[j] == "10 de Treboles" || vjugadores[a].cartas[j] == "Jota de Treboles" || vjugadores[a].cartas[j] == "Reina de Treboles" || vjugadores[a].cartas[j] == "Rey de Treboles")
+                else if (vjugadores[a].cartas[j] == "10 de Tréboles" || vjugadores[a].cartas[j] == "Jota de Tréboles" || vjugadores[a].cartas[j] == "Reina de Tréboles" || vjugadores[a].cartas[j] == "Rey de Tréboles")
                 {
                     vjugadores[a].suma = vjugadores[a].suma + 10;
                 }
@@ -665,16 +695,17 @@ int calcularSuma(vector<struct jugadores> &vjugadores, int i)
                     vjugadores[a].suma = vjugadores[a].suma + 10;
                 }
             }
+
             // Ahora un for para los As
             for (int j = 0; j < vjugadores[a].cartas.size(); j++)
             {
-                if (vjugadores[a].cartas[j] == "As de Corazones" || vjugadores[a].cartas[j] == "As de Diamantes" || vjugadores[a].cartas[j] == "As de Treboles" || vjugadores[a].cartas[j] == "As de Picas")
+                if (vjugadores[a].cartas[j] == "As de Corazones" || vjugadores[a].cartas[j] == "As de Diamantes" || vjugadores[a].cartas[j] == "As de Tréboles" || vjugadores[a].cartas[j] == "As de Picas")
                 {
-                    if (vjugadores[a].suma + 11 > 21)
+                    if ((vjugadores[a].suma + 11) > 21)
                     {
                         vjugadores[a].suma = vjugadores[a].suma + 1;
                     }
-                    else
+                    else if ((vjugadores[a].suma + 11) <= 21)
                     {
                         vjugadores[a].suma = vjugadores[a].suma + 11;
                     }
@@ -682,7 +713,8 @@ int calcularSuma(vector<struct jugadores> &vjugadores, int i)
             }
         }
     }
-    return vjugadores[ident].suma;
+
+    return vjugadores[posvector].suma;
 }
 
 /*void asignarCarta(vector<struct jugadores> &vjugadores, int i, vector<struct barajas> &vbaraja, int b)
