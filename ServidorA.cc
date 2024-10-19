@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <vector>
 
-#include "ServidorA.hpp"
+#include "servidora.hpp"
 
 #define MSG_SIZE 250
 #define MAX_CLIENTS 50
@@ -409,7 +409,31 @@ int main()
                                                 sprintf(buffer, "%s", vjugadores[l].cartas[c].c_str());
                                                 send(i, buffer, sizeof(buffer), 0);
                                             }
-                                            vjugadores[l].turno = false; // Cambia el turno del jugador a false, ya que ha pedido carta
+                                            //vjugadores[l].turno = false; // Cambia el turno del jugador a false, ya que ha pedido carta
+                                            if(calcularSuma(vjugadores, i) > 21)
+                                            {
+                                                //Enviar mensaje de que ya no se le mandan más cartas
+                                                //Cambiar el turno
+                                                vjugadores[l].turno = false;
+                                                int socketOponente;
+                                                if(vpartidas[vjugadores[l].identificadorPartida].jugador1.identificadorUsuario == i)
+                                                {
+                                                    socketOponente = vpartidas[vjugadores[l].identificadorPartida].jugador2.identificadorUsuario;
+                                                }
+                                                else
+                                                {
+                                                    socketOponente = vpartidas[vjugadores[l].identificadorPartida].jugador1.identificadorUsuario;
+                                                }
+
+                                                for (size_t o = 0; o < vjugadores.size(); o++)
+                                                {
+                                                    if(vjugadores[o].identificadorUsuario==socketOponente)
+                                                    {
+                                                        vjugadores[o].turno = true;
+                                                    }
+                                                }
+                                                
+                                            }
                                         }
                                     }
                                 }
@@ -424,6 +448,31 @@ int main()
                             /* PLANTARME (HACER) */
                             else if (strncmp(buffer, "PLANTARME", strlen("PLANTARME")) == 0)
                             {
+                                for (int a = 0; a < vjugadores.size(); a++)
+                                {
+                                    if (vjugadores[a].identificadorUsuario == i)
+                                    {
+                                        vjugadores[a].turno=false;
+                                    }
+                                }
+                                int aux;
+                                for (int a = 0; a < vpartidas.size(); a++)
+                                {
+                                    if (vpartidas[a].jugador1.identificadorUsuario == i)
+                                    {
+                                        aux=vpartidas[a].jugador2.identificadorUsuario;
+                                    } else if (vpartidas[a].jugador2.identificadorUsuario == i)
+                                    {
+                                        aux=vpartidas[a].jugador1.identificadorUsuario;
+                                    }
+                                }
+                                for(int a=0; a<vjugadores.size(); a++)
+                                {
+                                    if (vjugadores[a].identificadorUsuario == aux)
+                                    {
+                                        vjugadores[a].turno=true;
+                                    }
+                                }
                             }
                             else
                             {
