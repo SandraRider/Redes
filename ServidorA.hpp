@@ -315,7 +315,7 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
     // Comprueba si hay un jugador solo esperando pareja
     for (int i = 0; i < vpartidas.size(); i++)
     {
-        if (vpartidas[i].jugador1.estado == 3)
+        if (vpartidas[i].jugador1.estado == 3 && vpartidas[i].jugador2.estado == 0)
         {
             for (int j = 0; j < vjugadores.size(); j++)
             {
@@ -367,6 +367,7 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
                 vjugadores[j].plantado = false;
                 vjugadores[j].identificadorPartida = vpartidas.size();
                 p.jugador1 = vjugadores[j];
+                p.jugador2.estado = 0;
             }
         }
         vpartidas.push_back(p);
