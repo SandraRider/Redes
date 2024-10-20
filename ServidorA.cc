@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <vector>
 
-#include "servidora.hpp"
+#include "ServidorA.hpp"
 
 #define MSG_SIZE 250   // El tamaño máximo envío una cadena de longitud 250 caracteres
 #define MAX_CLIENTS 30 // El número máximo de clientes conectados será de 30 usuarios
