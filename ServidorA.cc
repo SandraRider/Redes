@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <vector>
 
-#include "ServidorA.hpp"
+#include "servidora.hpp"
 
 #define MSG_SIZE 250   // El tamaño máximo envío una cadena de longitud 250 caracteres
 #define MAX_CLIENTS 30 // El número máximo de clientes conectados será de 30 usuarios
@@ -428,10 +428,41 @@ int main()
                                                 }
                                             }
                                         }
+
                                         // Decirle al jugador 2 la suma de las cartas que tiene
                                         bzero(buffer, sizeof(buffer));
                                         sprintf(buffer, "-> Suma de tus cartas: %d", calcularSuma(vjugadores, j));
                                         send(j, buffer, sizeof(buffer), 0);
+
+
+                                        // Decirle al jugador 1 la primera carta del jugador 2
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-> Tu oponente ha recibido la carta:");
+                                        send(i, buffer, sizeof(buffer), 0);
+                                        for (int l = 0; l < vjugadores.size(); l++)
+                                        {
+                                            if (vjugadores[l].identificadorUsuario == j)
+                                            {
+                                                bzero(buffer, sizeof(buffer));
+                                                sprintf(buffer, "\t%s", vjugadores[l].cartas[0].c_str());
+                                                send(i, buffer, sizeof(buffer), 0);
+                                            }
+                                        }
+
+                                        // Decirle al jugador 2 la primera carta del jugador 1
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-> Tu oponente ha recibido la carta:");
+                                        send(j, buffer, sizeof(buffer), 0);
+                                        for (int l = 0; l < vjugadores.size(); l++)
+                                        {
+                                            if (vjugadores[l].identificadorUsuario == i)
+                                            {
+                                                bzero(buffer, sizeof(buffer));
+                                                sprintf(buffer, "\t%s", vjugadores[l].cartas[0].c_str());
+                                                send(j, buffer, sizeof(buffer), 0);
+                                            }
+                                        }
+
 
                                         if (calcularSuma(vjugadores, i) == 21) // BLACKJACK del jugador 1
                                         {
@@ -491,7 +522,6 @@ int main()
                                         {
                                             if (turnoJugador) // Si es el turno del jugador (turno = true)
                                             {
-
                                                 int idbaraja = 0, idJugador2 = 0;
                                                 bool plantadoJugador2;
                                                 for (int h = 0; h < vpartidas.size(); h++)
@@ -551,16 +581,18 @@ int main()
                                                         /* NO FUNCIONA CUANDO UN JUGADOR SE PLANTA Y EL OTRO PIDE MÁS CARTAS (FUNCIONA SOLO 1 VEZ, LA SEGUNDA VEZ QUE PIDE CARTAS DICE QUE NO ES SU TURNO)*/
                                                         /*------------------------------------------------------------------------------------------------------------------------------------------------*/
 
+                                                        /*
                                                         if (!plantadoJugador2) // Si no se ha plantado el Jugador 2
                                                         {
                                                             vjugadores[l].turno = false; // Cambia el turno del jugador 1 a false, ya que ha pedido una carta
                                                         }
-                                                    }
+                                                        */
+                                                    }/*
                                                     else if ((vjugadores[l].identificadorUsuario == idJugador2) && (!vjugadores[l].plantado))
                                                     {
                                                         // Cambia el turno del jugador 2 a true, ya que el jugador 1 ya ha pedido carta
                                                         vjugadores[l].turno = true;
-                                                    }
+                                                    }*/
                                                 }
                                             }
                                             else if (!turnoJugador) // Si no es el turno del jugador (turno = false)
