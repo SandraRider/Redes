@@ -1,3 +1,14 @@
+/**
+ * @file cliente.cc
+ * @author Laura Muñoz Jurado y Sandra Rider Gómez
+ * @brief Cliente para un sistema de juego de cartas BlackJack.
+ * @date 2024
+ *
+ * Este programa implementa el cliente de un sistema de juego de cartas BlackJack.
+ * Se conecta a un servidor mediante sockets, envía y recibe mensajes en un bucle
+ * hasta que el servidor se desconecta o el usuario decide salir.
+ */
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -9,22 +20,28 @@
 #include <time.h>
 #include <arpa/inet.h>
 
+/**
+ * @fn int main()
+ * @brief Función principal del cliente BlackJack.
+ *
+ * Establece la conexión con el servidor de BlackJack, luego entra en un bucle
+ * donde espera mensajes del servidor o del usuario. Los mensajes se envían al servidor
+ * y las respuestas se reciben para su visualización. El cliente finaliza cuando
+ * el servidor se apaga o el usuario ingresa el comando "SALIR".
+ *
+ * @return int Si la ejecución fue exitosa retorna 0 y retorna otro valor si hubo un error.
+ */
 int main()
 {
-    /*----------------------------------------------------
-        Descriptor del socket y buffer de datos
-    -----------------------------------------------------*/
-    int sd;
-    struct sockaddr_in sockname;
-    char buffer[250];
+    int sd;                      // Descriptor del socket
+    struct sockaddr_in sockname; // Estructura para almacenar la dirección del servidor
+    char buffer[250];            // Buffer para la comunicación
     socklen_t len_sockname;
     fd_set readfds, auxfds;
     int salida;
     int fin = 0;
 
-    /* --------------------------------------------------
-        Se abre el socket
-    ---------------------------------------------------*/
+    // Se abre el socket para la conexión
     sd = socket(AF_INET, SOCK_STREAM, 0);
     if (sd == -1)
     {
@@ -32,17 +49,12 @@ int main()
         exit(1);
     }
 
-    /* ------------------------------------------------------------------
-        Se rellenan los campos de la estructura con la IP del
-        servidor y el puerto del servicio que solicitamos
-    -------------------------------------------------------------------*/
+    // Configuración del servidor
     sockname.sin_family = AF_INET;
-    sockname.sin_port = htons(2060);
+    sockname.sin_port = htons(2060); // El servidor aceptará servicios en el puerto 2060
     sockname.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    /* ------------------------------------------------------------------
-        Se solicita la conexión con el servidor
-    -------------------------------------------------------------------*/
+    // Solicitud de conexión con el servidor
     len_sockname = sizeof(sockname);
 
     if (connect(sd, (struct sockaddr *)&sockname, len_sockname) == -1)
@@ -58,15 +70,13 @@ int main()
     FD_SET(0, &readfds);
     FD_SET(sd, &readfds);
 
-    /* ------------------------------------------------------------------
-        Se transmite la información
-    -------------------------------------------------------------------*/
+    // Bucle de comunicación
     do
     {
         auxfds = readfds;
         salida = select(sd + 1, &auxfds, NULL, NULL, NULL);
 
-        // Tengo mensaje desde el servidor
+        // Si hay mensaje desde el servidor
         if (FD_ISSET(sd, &auxfds))
         {
 
@@ -95,7 +105,7 @@ int main()
         else
         {
 
-            // He introducido información por teclado
+            // Si ha introducido información por teclado
             if (FD_ISSET(0, &auxfds))
             {
                 bzero(buffer, sizeof(buffer));
@@ -113,7 +123,7 @@ int main()
 
     } while (fin == 0);
 
-    close(sd);
+    close(sd); // Cierra el socket
 
     return 0;
 }
